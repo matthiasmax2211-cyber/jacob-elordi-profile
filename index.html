@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>instagram.com/jacob_____elordi</title>
+  <style>
+    /* ---------- GLOBAL DESIGN SYSTEM ---------- */
+    :root {
+      --bg-main: #fafafa;
+      --bg-surface: #ffffff;
+      --text-primary: #262626;
+      --text-secondary: #8e8e8e;
+      --border-subtle: #dbdbdb;
+      --accent: #0095f6;
+      --overlay: rgba(0, 0, 0, 0.85);
+      --grid-gap: 2px;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg-main);
+      color: var(--text-primary);
+      line-height: 1.5;
+      transition: background-color 0.2s, color 0.2s;
+      min-height: 100vh;
+    }
+
+    .profile-header {
+      background-color: var(--bg-surface);
+      padding: 16px 16px 0 16px;
+      border-bottom: 1px solid var(--border-subtle);
+      transition: background-color 0.2s, border-color 0.2s, transform 0.1s ease-out;
+      will-change: transform;
+    }
+
+    .top-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .username {
+      font-size: 20px;
+      font-weight: 600;
+      letter-spacing: -0.3px;
+      color: var(--text-primary);
+    }
+
+    .profile-stats-row {
+      display: flex;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    .profile-pic {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      overflow: hidden;
+      margin-right: 24px;
+      flex-shrink: 0;
+      cursor: pointer;
+      background: #f0f0f0;
+    }
+    .profile-pic img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .stats {
+      flex: 1;
+      display: flex;
+      justify-content: space-around;
+      text-align: center;
+    }
+    .stat-item {
+      font-size: 14px;
+    }
+    .stat-number {
+      font-weight: 600;
+      display: block;
+      color: var(--text-primary);
+    }
+    .stat-label {
+      color: var(--text-secondary);
+      font-size: 12px;
+    }
+
+    .bio {
+      margin-bottom: 16px;
+      font-size: 14px;
+    }
+    .bio .name {
+      font-weight: 600;
+      margin-bottom: 4px;
+      color: var(--text-primary);
+    }
+    .bio .text {
+      white-space: pre-line;
+      color: var(--text-primary);
+    }
+
+    .highlights {
+      display: flex;
+      gap: 16px;
+      overflow-x: auto;
+      padding: 8px 0 16px;
+      scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
+    }
+    .highlights::-webkit-scrollbar {
+      display: none;
+    }
+    .highlight-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      color: var(--text-primary);
+    }
+    .highlight-circle {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      border: 1px solid var(--border-subtle);
+      padding: 2px;
+      background: var(--bg-surface);
+    }
+    .highlight-circle img {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+    .highlight-label {
+      max-width: 70px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      color: var(--text-secondary);
+    }
+
+    .post-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--grid-gap);
+      margin-top: 4px;
+      background: var(--bg-surface);
+    }
+    .grid-item {
+      aspect-ratio: 1 / 1;
+      background: #efefef;
+      position: relative;
+      cursor: pointer;
+      overflow: hidden;
+      transition: box-shadow 0.2s, filter 0.2s;
+    }
+    .grid-item:hover {
+      box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+      filter: brightness(1.01);
+      z-index: 3;
+    }
+    .grid-item img,
+    .grid-item video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      pointer-events: none;
+      background: #eaeaea;
+    }
+    .reel-indicator {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      width: 20px;
+      height: 20px;
+      background: rgba(0,0,0,0.5);
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 12px;
+      backdrop-filter: blur(2px);
+      border: 0.5px solid rgba(255,255,255,0.3);
+    }
+    .reel-indicator::after {
+      content: "▶";
+      font-size: 10px;
+      line-height: 1;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: var(--overlay);
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      backdrop-filter: blur(4px);
+    }
+    .modal.show {
+      display: flex;
+    }
+    .modal-content {
+      max-width: 90vw;
+      max-height: 90vh;
+      position: relative;
+      transform: scale(0.98);
+      transition: transform 0.2s cubic-bezier(0.2, 0.9, 0.3, 1);
+    }
+    .modal.show .modal-content {
+      transform: scale(1);
+    }
+    .modal-content img,
+    .modal-content video {
+      width: auto;
+      height: auto;
+      max-width: 100%;
+      max-height: 90vh;
+      border-radius: 4px;
+    }
+    .modal-close {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      color: white;
+      font-size: 32px;
+      cursor: pointer;
+      z-index: 1001;
+      text-shadow: 0 2px 10px black;
+    }
+
+    .admin-panel {
+      display: none;
+      margin: 20px 16px;
+      padding: 20px;
+      background: var(--bg-surface);
+      border-radius: 24px;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+      border: 1px solid var(--border-subtle);
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 20px;
+      transition: background-color 0.2s, border-color 0.2s;
+    }
+    .admin-panel.visible {
+      display: flex;
+      flex-wrap: wrap;
+    }
+    .color-control {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .color-control label {
+      font-size: 12px;
+      color: var(--text-secondary);
+      min-width: 70px;
+    }
+    .color-control input {
+      width: 50px;
+      height: 30px;
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      background: transparent;
+      cursor: pointer;
+    }
+    .toggle-switch {
+      width: 44px;
+      height: 24px;
+      background: #ccc;
+      border-radius: 30px;
+      position: relative;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .toggle-switch.active {
+      background: var(--accent);
+    }
+    .toggle-switch::after {
+      content: '';
+      display: block;
+      width: 20px;
+      height: 20px;
+      background: white;
+      border-radius: 50%;
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      transition: transform 0.2s;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+    }
+    .toggle-switch.active::after {
+      transform: translateX(20px);
+    }
+    .admin-section {
+      width: 100%;
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid var(--border-subtle);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      align-items: center;
+    }
+    .slider-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+    .slider-label input {
+      width: 100px;
+    }
+    .reset-btn, .reload-btn {
+      padding: 6px 16px;
+      background: transparent;
+      border: 1px solid var(--border-subtle);
+      border-radius: 30px;
+      font-size: 12px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: background 0.1s;
+    }
+    .reset-btn:hover, .reload-btn:hover {
+      background: var(--border-subtle);
+      color: var(--text-primary);
+    }
+    .edit-hint {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-left: auto;
+    }
+  </style>
+</head>
+<body>
+  <div class="profile-header" id="profileHeader">
+    <div class="top-row">
+      <span class="username" id="usernameDisplay">jacob_____elordi</span>
+    </div>
+    <div class="profile-stats-row">
+      <div class="profile-pic" id="profilePicTrigger">
+        <img src="profile.jpg" alt="profile" onerror="this.src='https://via.placeholder.com/80?text=DP'">
+      </div>
+      <div class="stats">
+        <div class="stat-item"><span class="stat-number" id="postsCount">0</span><span class="stat-label">posts</span></div>
+        <div class="stat-item"><span class="stat-number" id="followersCount">170</span><span class="stat-label">followers</span></div>
+        <div class="stat-item"><span class="stat-number" id="followingCount">70</span><span class="stat-label">following</span></div>
+      </div>
+    </div>
+    <div class="bio">
+      <div class="name" id="bioName">Jacob Elordi</div>
+      <div class="text" id="bioText">⚡ builder · creator ⚡\n✖️ based somewhere</div>
+    </div>
+    <div class="highlights" id="highlightsRow"></div>
+  </div>
+
+  <div class="post-grid" id="postGrid"></div>
+
+  <div class="admin-panel" id="adminPanel">
+    <div class="color-control">
+      <label>background</label>
+      <input type="color" id="bgMainColor" value="#fafafa">
+    </div>
+    <div class="color-control">
+      <label>surface</label>
+      <input type="color" id="bgSurfaceColor" value="#ffffff">
+    </div>
+    <div class="color-control">
+      <label>primary text</label>
+      <input type="color" id="textPrimaryColor" value="#262626">
+    </div>
+    <div class="color-control">
+      <label>secondary text</label>
+      <input type="color" id="textSecondaryColor" value="#8e8e8e">
+    </div>
+    <div class="color-control">
+      <label>border</label>
+      <input type="color" id="borderColor" value="#dbdbdb">
+    </div>
+    <div class="color-control">
+      <label>accent</label>
+      <input type="color" id="accentColor" value="#0095f6">
+    </div>
+    <div class="color-control">
+      <label>overlay</label>
+      <input type="color" id="overlayColor" value="#000000">
+    </div>
+
+    <div class="admin-section">
+      <div class="slider-label">
+        <span>motion sensitivity</span>
+        <input type="range" id="motionSlider" min="0" max="1" step="0.1" value="0.5">
+      </div>
+      <div style="display:flex; align-items:center; gap:8px;">
+        <span style="font-size:13px; color:var(--text-secondary);">edit mode</span>
+        <div class="toggle-switch" id="editModeToggle"></div>
+      </div>
+      <button class="reload-btn" id="reloadContentBtn">↻ reload</button>
+      <button class="reset-btn" id="resetDefaults">reset colors</button>
+      <span class="edit-hint">(click post to replace image)</span>
+    </div>
+  </div>
+
+  <div class="modal" id="mediaModal">
+    <span class="modal-close" id="modalClose">&times;</span>
+    <div class="modal-content" id="modalContent"></div>
+  </div>
+
+  <input type="file" id="fileUpload" accept="image/*" style="display: none;">
+
+  <script>
+    (function() {
+      // Profile info
+      const USERNAME = 'jacob_____elordi';
+      const NAME = 'Jacob Elordi';
+      const BIO = `⚡ builder · creator ⚡\n✖️ based somewhere`;
+      const FOLLOWERS = '700';
+      const FOLLOWING = '0';
+
+      // DOM elements
+      const usernameSpan = document.getElementById('usernameDisplay');
+      const bioName = document.getElementById('bioName');
+      const bioText = document.getElementById('bioText');
+      const postsCountSpan = document.getElementById('postsCount');
+      const followersSpan = document.getElementById('followersCount');
+      const followingSpan = document.getElementById('followingCount');
+      const highlightsRow = document.getElementById('highlightsRow');
+      const postGrid = document.getElementById('postGrid');
+      const adminPanel = document.getElementById('adminPanel');
+      const profilePic = document.getElementById('profilePicTrigger');
+      const modal = document.getElementById('mediaModal');
+      const modalContent = document.getElementById('modalContent');
+      const modalClose = document.getElementById('modalClose');
+      const motionSlider = document.getElementById('motionSlider');
+      const resetBtn = document.getElementById('resetDefaults');
+      const reloadBtn = document.getElementById('reloadContentBtn');
+      const editModeToggle = document.getElementById('editModeToggle');
+      const fileUpload = document.getElementById('fileUpload');
+
+      // Color inputs
+      const bgMainInput = document.getElementById('bgMainColor');
+      const bgSurfaceInput = document.getElementById('bgSurfaceColor');
+      const textPrimaryInput = document.getElementById('textPrimaryColor');
+      const textSecondaryInput = document.getElementById('textSecondaryColor');
+      const borderInput = document.getElementById('borderColor');
+      const accentInput = document.getElementById('accentColor');
+      const overlayInput = document.getElementById('overlayColor');
+
+      // Set static profile
+      usernameSpan.textContent = USERNAME;
+      bioName.textContent = NAME;
+      bioText.textContent = BIO;
+      followersSpan.textContent = FOLLOWERS;
+      followingSpan.textContent = FOLLOWING;
+
+      // State
+      let mediaItems = [];
+      let highlights = [];
+      let adminVisible = false;
+      let motionFactor = 0.5;
+      let editMode = false;
+      let customPosts = {};
+
+      // Load custom posts from localStorage
+      try {
+        const saved = localStorage.getItem('customPosts');
+        if (saved) customPosts = JSON.parse(saved);
+      } catch (e) {}
+
+      // ---------- FILE EXISTENCE CHECK (works with file://) ----------
+      function checkImageExists(url) {
+        return new Promise((resolve) => {
+          const img = new Image();
+          img.onload = () => resolve(true);
+          img.onerror = () => resolve(false);
+          img.src = url;
+        });
+      }
+
+      function checkVideoExists(url) {
+        return new Promise((resolve) => {
+          const video = document.createElement('video');
+          video.preload = 'metadata';
+          video.onloadedmetadata = () => resolve(true);
+          video.onerror = () => resolve(false);
+          video.src = url;
+        });
+      }
+
+      // ---------- LOAD HIGHLIGHTS (root: highlight1.jpg, highlight2.png, ...) ----------
+      async function loadHighlights() {
+        const items = [];
+        let idx = 1;
+        while (true) {
+          const jpg = `highlight${idx}.jpg`;
+          const png = `highlight${idx}.png`;
+          const jpgExists = await checkImageExists(jpg);
+          if (jpgExists) {
+            items.push({ url: jpg, label: `highlight${idx}` });
+            idx++;
+            continue;
+          }
+          const pngExists = await checkImageExists(png);
+          if (pngExists) {
+            items.push({ url: png, label: `highlight${idx}` });
+            idx++;
+            continue;
+          }
+          break;
+        }
+        return items;
+      }
+
+      // ---------- LOAD POSTS & REELS (root: 1.jpg, 2.mp4, 3.png, ...) ----------
+      async function loadAllMedia() {
+        const items = [];
+        let idx = 1;
+        while (true) {
+          let found = false;
+          // image
+          const imgJpg = `${idx}.jpg`;
+          const imgPng = `${idx}.png`;
+          const jpgExists = await checkImageExists(imgJpg);
+          if (jpgExists) {
+            items.push({ url: imgJpg, type: 'image' });
+            found = true;
+          } else {
+            const pngExists = await checkImageExists(imgPng);
+            if (pngExists) {
+              items.push({ url: imgPng, type: 'image' });
+              found = true;
+            }
+          }
+          // video
+          const videoMp4 = `${idx}.mp4`;
+          const mp4Exists = await checkVideoExists(videoMp4);
+          if (mp4Exists) {
+            items.push({ url: videoMp4, type: 'video' });
+            found = true;
+          }
+          if (!found) break;
+          idx++;
+        }
+        return items;
+      }
+
+      // Apply custom uploaded images
+      function applyCustomPosts(baseItems) {
+        const items = [...baseItems];
+        for (let idx in customPosts) {
+          idx = parseInt(idx);
+          if (idx >= 0 && idx < items.length) {
+            items[idx] = { url: customPosts[idx], type: 'image' };
+          }
+        }
+        return items;
+      }
+
+      function saveCustomPosts() {
+        localStorage.setItem('customPosts', JSON.stringify(customPosts));
+      }
+
+      async function refreshContent() {
+        highlights = await loadHighlights();
+        const baseMedia = await loadAllMedia();
+        mediaItems = applyCustomPosts(baseMedia);
+        renderHighlights(highlights);
+        renderGrid(mediaItems);
+      }
+
+      function renderHighlights(highlights) {
+        if (!highlights.length) {
+          highlightsRow.innerHTML = '<div style="padding:10px;color:var(--text-secondary);">no highlights</div>';
+          return;
+        }
+        let html = '';
+        highlights.forEach(h => {
+          html += `<div class="highlight-item">
+            <div class="highlight-circle"><img src="${h.url}" alt="highlight" loading="lazy" onerror="this.src='https://via.placeholder.com/64?text=H'"></div>
+            <span class="highlight-label">${h.label}</span>
+          </div>`;
+        });
+        highlightsRow.innerHTML = html;
+      }
+
+      function renderGrid(media) {
+        if (!media.length) {
+          postGrid.innerHTML = '<div style="grid-column:span 3; text-align:center;padding:40px;color:var(--text-secondary);">📷 No posts found.<br>Place files in the same folder as this page:<br>1.jpg, 2.mp4, 3.png, ... (check console)</div>';
+          postsCountSpan.textContent = '0';
+          return;
+        }
+        let html = '';
+        media.forEach((item, idx) => {
+          const isReel = item.type === 'video';
+          html += `<div class="grid-item" data-index="${idx}" data-type="${item.type}" data-url="${item.url}">`;
+          if (isReel) {
+            html += `<video src="${item.url}" muted playsinline></video><div class="reel-indicator"></div>`;
+          } else {
+            html += `<img src="${item.url}" loading="lazy" onerror="this.src='https://via.placeholder.com/300?text=err'">`;
+          }
+          html += `</div>`;
+        });
+        postGrid.innerHTML = html;
+        postsCountSpan.textContent = media.length;
+
+        document.querySelectorAll('.grid-item').forEach(item => {
+          item.addEventListener('click', (e) => {
+            const idx = item.dataset.index;
+            const type = item.dataset.type;
+            const url = item.dataset.url;
+
+            if (adminVisible && editMode) {
+              e.preventDefault();
+              fileUpload.onchange = () => {
+                const file = fileUpload.files[0];
+                if (file && file.type.startsWith('image/')) {
+                  const reader = new FileReader();
+                  reader.onload = (e) => {
+                    customPosts[idx] = e.target.result;
+                    saveCustomPosts();
+                    refreshContent();
+                  };
+                  reader.readAsDataURL(file);
+                }
+                fileUpload.value = '';
+              };
+              fileUpload.click();
+            } else {
+              openModal(url, type);
+            }
+          });
+        });
+      }
+
+      function openModal(url, type) {
+        modalContent.innerHTML = '';
+        if (type === 'image') {
+          const img = document.createElement('img');
+          img.src = url;
+          modalContent.appendChild(img);
+        } else {
+          const video = document.createElement('video');
+          video.src = url;
+          video.controls = true;
+          video.autoplay = true;
+          video.playsInline = true;
+          modalContent.appendChild(video);
+        }
+        modal.classList.add('show');
+        document.body.style.overflow = 'hidden';
+      }
+
+      function closeModal() {
+        modal.classList.remove('show');
+        document.body.style.overflow = '';
+        modalContent.innerHTML = '';
+      }
+
+      modalClose.addEventListener('click', closeModal);
+      modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+      window.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
+
+      // Scroll header micro-motion
+      const header = document.getElementById('profileHeader');
+      window.addEventListener('scroll', () => {
+        if (!header) return;
+        const factor = motionFactor * 0.5;
+        const scrollY = window.scrollY;
+        let move = Math.min(3, scrollY * 0.02 * factor);
+        header.style.transform = `translateY(${move}px)`;
+      });
+
+      // Theme management
+      const root = document.documentElement;
+      function setCSSVariable(name, value) {
+        root.style.setProperty(name, value);
+        localStorage.setItem(name, value);
+      }
+
+      function hexToRgb(hex) {
+        const c = hex.substring(1);
+        const r = parseInt(c.substring(0,2), 16);
+        const g = parseInt(c.substring(2,4), 16);
+        const b = parseInt(c.substring(4,6), 16);
+        return `${r}, ${g}, ${b}`;
+      }
+
+      // Load saved colors
+      const savedVars = [
+        '--bg-main', '--bg-surface', '--text-primary', '--text-secondary',
+        '--border-subtle', '--accent', '--overlay'
+      ];
+      savedVars.forEach(varName => {
+        const saved = localStorage.getItem(varName);
+        if (saved) {
+          root.style.setProperty(varName, saved);
+          if (varName === '--bg-main') bgMainInput.value = saved;
+          else if (varName === '--bg-surface') bgSurfaceInput.value = saved;
+          else if (varName === '--text-primary') textPrimaryInput.value = saved;
+          else if (varName === '--text-secondary') textSecondaryInput.value = saved;
+          else if (varName === '--border-subtle') borderInput.value = saved;
+          else if (varName === '--accent') accentInput.value = saved;
+          else if (varName === '--overlay') overlayInput.value = saved;
+        }
+      });
+
+      if (localStorage.getItem('--overlay')) {
+        const hex = localStorage.getItem('--overlay');
+        root.style.setProperty('--overlay', `rgba(${hexToRgb(hex)}, 0.85)`);
+      }
+
+      bgMainInput.addEventListener('input', (e) => setCSSVariable('--bg-main', e.target.value));
+      bgSurfaceInput.addEventListener('input', (e) => setCSSVariable('--bg-surface', e.target.value));
+      textPrimaryInput.addEventListener('input', (e) => setCSSVariable('--text-primary', e.target.value));
+      textSecondaryInput.addEventListener('input', (e) => setCSSVariable('--text-secondary', e.target.value));
+      borderInput.addEventListener('input', (e) => setCSSVariable('--border-subtle', e.target.value));
+      accentInput.addEventListener('input', (e) => setCSSVariable('--accent', e.target.value));
+      overlayInput.addEventListener('input', (e) => {
+        const hex = e.target.value;
+        setCSSVariable('--overlay', `rgba(${hexToRgb(hex)}, 0.85)`);
+        localStorage.setItem('--overlay', hex);
+      });
+
+      // Admin panel: triple‑click profile pic
+      let clickCount = 0, clickTimer;
+      profilePic.addEventListener('click', () => {
+        clickCount++;
+        if (clickCount === 3) {
+          clearTimeout(clickTimer);
+          clickCount = 0;
+          adminVisible = !adminVisible;
+          adminPanel.classList.toggle('visible', adminVisible);
+        } else {
+          clearTimeout(clickTimer);
+          clickTimer = setTimeout(() => { clickCount = 0; }, 500);
+        }
+      });
+
+      // Edit mode toggle
+      const editModeState = localStorage.getItem('editMode') === 'true';
+      function setEditMode(active) {
+        editMode = active;
+        editModeToggle.classList.toggle('active', active);
+        localStorage.setItem('editMode', active);
+      }
+      editModeToggle.addEventListener('click', () => setEditMode(!editMode));
+      setEditMode(editModeState);
+
+      // Motion slider
+      const savedMotion = localStorage.getItem('motionFactor');
+      if (savedMotion) {
+        motionFactor = parseFloat(savedMotion);
+        motionSlider.value = savedMotion;
+      }
+      motionSlider.addEventListener('input', (e) => {
+        motionFactor = parseFloat(e.target.value);
+        localStorage.setItem('motionFactor', motionFactor);
+      });
+
+      // Reload button
+      reloadBtn.addEventListener('click', refreshContent);
+
+      // Reset colors
+      resetBtn.addEventListener('click', () => {
+        const defaults = {
+          '--bg-main': '#fafafa',
+          '--bg-surface': '#ffffff',
+          '--text-primary': '#262626',
+          '--text-secondary': '#8e8e8e',
+          '--border-subtle': '#dbdbdb',
+          '--accent': '#0095f6',
+          '--overlay': '#000000'
+        };
+        Object.entries(defaults).forEach(([k, v]) => {
+          if (k === '--overlay') {
+            setCSSVariable(k, `rgba(${hexToRgb(v)}, 0.85)`);
+            localStorage.setItem(k, v);
+          } else {
+            setCSSVariable(k, v);
+          }
+        });
+        bgMainInput.value = '#fafafa';
+        bgSurfaceInput.value = '#ffffff';
+        textPrimaryInput.value = '#262626';
+        textSecondaryInput.value = '#8e8e8e';
+        borderInput.value = '#dbdbdb';
+        accentInput.value = '#0095f6';
+        overlayInput.value = '#000000';
+
+        motionSlider.value = 0.5;
+        motionFactor = 0.5;
+        localStorage.setItem('motionFactor', 0.5);
+      });
+
+      // Start
+      refreshContent();
+    })();
+  </script>
+</body>
+</html>
