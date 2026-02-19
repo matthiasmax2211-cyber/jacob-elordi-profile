@@ -5,15 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>instagram.com/jacob_____elordi</title>
   <style>
-    /* ---------- GLOBAL DESIGN SYSTEM ---------- */
+    /* ---------- YOUR CUSTOM COLOR SCHEME ---------- */
     :root {
-      --bg-main: #fafafa;
-      --bg-surface: #ffffff;
-      --text-primary: #262626;
-      --text-secondary: #8e8e8e;
-      --border-subtle: #dbdbdb;
-      --accent: #0095f6;
-      --overlay: rgba(0, 0, 0, 0.85);
+      --bg-main: #e58b8b;
+      --bg-surface: #e1a8a8;
+      --text-primary: #1a1a1a;
+      --text-secondary: #6b6b6b;
+      --border-subtle: #8a1919;
+      --accent: #b76e79;
+      --overlay: rgba(0, 0, 0, 0.75);
       --grid-gap: 2px;
     }
 
@@ -163,7 +163,7 @@
       transition: box-shadow 0.2s, filter 0.2s;
     }
     .grid-item:hover {
-      box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.1);
       filter: brightness(1.01);
       z-index: 3;
     }
@@ -246,7 +246,7 @@
       padding: 20px;
       background: var(--bg-surface);
       border-radius: 24px;
-      box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.1);
       border: 1px solid var(--border-subtle);
       flex-wrap: wrap;
       align-items: center;
@@ -298,7 +298,7 @@
       top: 2px;
       left: 2px;
       transition: transform 0.2s;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.2);
     }
     .toggle-switch.active::after {
       transform: translateX(20px);
@@ -323,7 +323,7 @@
     .slider-label input {
       width: 100px;
     }
-    .reset-btn, .reload-btn {
+    .reset-btn, .reload-btn, .export-btn {
       padding: 6px 16px;
       background: transparent;
       border: 1px solid var(--border-subtle);
@@ -333,7 +333,7 @@
       cursor: pointer;
       transition: background 0.1s;
     }
-    .reset-btn:hover, .reload-btn:hover {
+    .reset-btn:hover, .reload-btn:hover, .export-btn:hover {
       background: var(--border-subtle);
       color: var(--text-primary);
     }
@@ -341,6 +341,53 @@
       font-size: 12px;
       color: var(--text-secondary);
       margin-left: auto;
+    }
+
+    /* Export theme modal */
+    .export-modal {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: var(--bg-surface);
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+      z-index: 2000;
+      max-width: 90vw;
+      width: 500px;
+    }
+    .export-modal.show {
+      display: block;
+    }
+    .export-modal textarea {
+      width: 100%;
+      height: 200px;
+      background: var(--bg-main);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      padding: 12px;
+      font-family: monospace;
+      font-size: 12px;
+      color: var(--text-primary);
+      resize: vertical;
+      margin: 16px 0;
+    }
+    .export-modal .close-export {
+      float: right;
+      font-size: 24px;
+      cursor: pointer;
+      color: var(--text-secondary);
+    }
+    .export-modal .copy-btn {
+      background: var(--accent);
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 30px;
+      font-size: 14px;
+      cursor: pointer;
     }
   </style>
 </head>
@@ -371,27 +418,27 @@
   <div class="admin-panel" id="adminPanel">
     <div class="color-control">
       <label>background</label>
-      <input type="color" id="bgMainColor" value="#fafafa">
+      <input type="color" id="bgMainColor" value="#e58b8b">
     </div>
     <div class="color-control">
       <label>surface</label>
-      <input type="color" id="bgSurfaceColor" value="#ffffff">
+      <input type="color" id="bgSurfaceColor" value="#e1a8a8">
     </div>
     <div class="color-control">
       <label>primary text</label>
-      <input type="color" id="textPrimaryColor" value="#262626">
+      <input type="color" id="textPrimaryColor" value="#1a1a1a">
     </div>
     <div class="color-control">
       <label>secondary text</label>
-      <input type="color" id="textSecondaryColor" value="#8e8e8e">
+      <input type="color" id="textSecondaryColor" value="#6b6b6b">
     </div>
     <div class="color-control">
       <label>border</label>
-      <input type="color" id="borderColor" value="#dbdbdb">
+      <input type="color" id="borderColor" value="#8a1919">
     </div>
     <div class="color-control">
       <label>accent</label>
-      <input type="color" id="accentColor" value="#0095f6">
+      <input type="color" id="accentColor" value="#b76e79">
     </div>
     <div class="color-control">
       <label>overlay</label>
@@ -408,9 +455,19 @@
         <div class="toggle-switch" id="editModeToggle"></div>
       </div>
       <button class="reload-btn" id="reloadContentBtn">↻ reload</button>
+      <button class="export-btn" id="exportThemeBtn">🎨 export theme</button>
       <button class="reset-btn" id="resetDefaults">reset colors</button>
       <span class="edit-hint">(click post to replace image)</span>
     </div>
+  </div>
+
+  <!-- Export theme modal -->
+  <div class="export-modal" id="exportModal">
+    <span class="close-export" id="closeExport">&times;</span>
+    <h3 style="margin-bottom:12px; color:var(--text-primary);">Theme CSS</h3>
+    <p style="font-size:13px; color:var(--text-secondary); margin-bottom:8px;">Copy this and replace the <code>:root</code> section in your HTML file, then re‑upload to GitHub.</p>
+    <textarea id="themeCssText" readonly></textarea>
+    <button class="copy-btn" id="copyThemeBtn">Copy to clipboard</button>
   </div>
 
   <div class="modal" id="mediaModal">
@@ -426,8 +483,8 @@
       const USERNAME = 'jacob_____elordi';
       const NAME = 'Jacob Elordi';
       const BIO = `⚡ builder · creator ⚡\n✖️ based somewhere`;
-      const FOLLOWERS = '700';
-      const FOLLOWING = '0';
+      const FOLLOWERS = '170';
+      const FOLLOWING = '70';
 
       // DOM elements
       const usernameSpan = document.getElementById('usernameDisplay');
@@ -448,6 +505,11 @@
       const reloadBtn = document.getElementById('reloadContentBtn');
       const editModeToggle = document.getElementById('editModeToggle');
       const fileUpload = document.getElementById('fileUpload');
+      const exportBtn = document.getElementById('exportThemeBtn');
+      const exportModal = document.getElementById('exportModal');
+      const closeExport = document.getElementById('closeExport');
+      const themeCssText = document.getElementById('themeCssText');
+      const copyBtn = document.getElementById('copyThemeBtn');
 
       // Color inputs
       const bgMainInput = document.getElementById('bgMainColor');
@@ -718,7 +780,7 @@
 
       if (localStorage.getItem('--overlay')) {
         const hex = localStorage.getItem('--overlay');
-        root.style.setProperty('--overlay', `rgba(${hexToRgb(hex)}, 0.85)`);
+        root.style.setProperty('--overlay', `rgba(${hexToRgb(hex)}, 0.75)`);
       }
 
       bgMainInput.addEventListener('input', (e) => setCSSVariable('--bg-main', e.target.value));
@@ -729,7 +791,7 @@
       accentInput.addEventListener('input', (e) => setCSSVariable('--accent', e.target.value));
       overlayInput.addEventListener('input', (e) => {
         const hex = e.target.value;
-        setCSSVariable('--overlay', `rgba(${hexToRgb(hex)}, 0.85)`);
+        setCSSVariable('--overlay', `rgba(${hexToRgb(hex)}, 0.75)`);
         localStorage.setItem('--overlay', hex);
       });
 
@@ -772,31 +834,56 @@
       // Reload button
       reloadBtn.addEventListener('click', refreshContent);
 
+      // Export theme
+      exportBtn.addEventListener('click', () => {
+        const bgMain = getComputedStyle(root).getPropertyValue('--bg-main').trim();
+        const bgSurface = getComputedStyle(root).getPropertyValue('--bg-surface').trim();
+        const textPrimary = getComputedStyle(root).getPropertyValue('--text-primary').trim();
+        const textSecondary = getComputedStyle(root).getPropertyValue('--text-secondary').trim();
+        const border = getComputedStyle(root).getPropertyValue('--border-subtle').trim();
+        const accent = getComputedStyle(root).getPropertyValue('--accent').trim();
+        const overlay = getComputedStyle(root).getPropertyValue('--overlay').trim();
+
+        const css = `:root {\n  --bg-main: ${bgMain};\n  --bg-surface: ${bgSurface};\n  --text-primary: ${textPrimary};\n  --text-secondary: ${textSecondary};\n  --border-subtle: ${border};\n  --accent: ${accent};\n  --overlay: ${overlay};\n  --grid-gap: 2px;\n}`;
+        themeCssText.value = css;
+        exportModal.classList.add('show');
+      });
+
+      closeExport.addEventListener('click', () => {
+        exportModal.classList.remove('show');
+      });
+
+      copyBtn.addEventListener('click', () => {
+        themeCssText.select();
+        document.execCommand('copy');
+        alert('Copied to clipboard!');
+      });
+
       // Reset colors
       resetBtn.addEventListener('click', () => {
         const defaults = {
-          '--bg-main': '#fafafa',
-          '--bg-surface': '#ffffff',
-          '--text-primary': '#262626',
-          '--text-secondary': '#8e8e8e',
-          '--border-subtle': '#dbdbdb',
-          '--accent': '#0095f6',
+          '--bg-main': '#e58b8b',
+          '--bg-surface': '#e1a8a8',
+          '--text-primary': '#1a1a1a',
+          '--text-secondary': '#6b6b6b',
+          '--border-subtle': '#8a1919',
+          '--accent': '#b76e79',
           '--overlay': '#000000'
         };
         Object.entries(defaults).forEach(([k, v]) => {
           if (k === '--overlay') {
-            setCSSVariable(k, `rgba(${hexToRgb(v)}, 0.85)`);
+            setCSSVariable(k, `rgba(${hexToRgb(v)}, 0.75)`);
             localStorage.setItem(k, v);
           } else {
             setCSSVariable(k, v);
           }
         });
-        bgMainInput.value = '#fafafa';
-        bgSurfaceInput.value = '#ffffff';
-        textPrimaryInput.value = '#262626';
-        textSecondaryInput.value = '#8e8e8e';
-        borderInput.value = '#dbdbdb';
-        accentInput.value = '#0095f6';
+        bgMainInput.value = '#e58b8b';
+        bgSurfaceInput.value = '#e1a8a8';
+        textPrimaryInput.value = '#1a1a1a';
+        textSecondaryInput.value = '#6b6b6b';
+        borderInput.value = '#8a1919';
+        accentInput.value = '#b76e79';
         overlayInput.value = '#000000';
 
         motionSlider.value = 0.5;
